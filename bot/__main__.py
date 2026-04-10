@@ -1,4 +1,5 @@
 import random
+import re
 import logging
 from time import sleep
 import traceback
@@ -61,10 +62,21 @@ def forward(client:Client, message:Message):
         )
 
 
+def matches_any(message, words):
+    if not words:
+        return False
+    pattern = r"\b(" + "|".join(re.escape(w) for w in words) + r")\b"
+    return re.search(pattern, message, re.IGNORECASE) is not None
+
+
 def should_send_message(message):
     keywords = chats_map["filter"]
     if not keywords or len(keywords) == 0:
         return True
-    return any(keyword in message.lower() for keyword in keywords)
+    if message.rstrip().endswith("?"):
+        return False
+    if matches_any(message, chats_map.get("omit") or []):
+        return False
+    return matches_any(message, keywords)
 
 app.run()

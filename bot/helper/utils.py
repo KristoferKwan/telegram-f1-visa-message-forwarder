@@ -23,13 +23,15 @@ def parse_chats(chats):
     chats_map = {}
     filter = []
     chats_map["filter"] = []
+    chats_map["omit"] = []
 
     for chat in chats:
         from_chats = chat["from"]
         to_chats = chat["to"]
         filter = chat.get("filter")
+        omit = chat.get("omit")
         replace = chat.get("replace")
-        
+
         if not isinstance(from_chats, list):
             from_chats = [from_chats]
 
@@ -39,8 +41,14 @@ def parse_chats(chats):
         if not isinstance(filter, list) and filter is not None:
             filter = [filter]
 
+        if not isinstance(omit, list) and omit is not None:
+            omit = [omit]
+
         if filter:
             chats_map["filter"].extend(filter)
+
+        if omit:
+            chats_map["omit"].extend(omit)
 
         for from_chat in from_chats:
             if from_chat not in chats_map:
